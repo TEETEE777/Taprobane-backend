@@ -6,11 +6,12 @@ const {
   resetPassword,
 } = require("../controllers/user.controller");
 const { authenticate } = require("../middleware/authmiddleware");
+const verifyRecaptcha = require("../middleware/recaptcha.middleware");
 const router = express.Router();
 
-router.post("/register", registerUser);
+router.post("/register", verifyRecaptcha(), registerUser);
 
-router.post("/login", loginUser);
+router.post("/login", verifyRecaptcha(), loginUser);
 
 router.get("/current", authenticate, currentUser);
 
