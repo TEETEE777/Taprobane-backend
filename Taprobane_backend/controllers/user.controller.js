@@ -68,6 +68,11 @@ const loginUser = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid email or password" }); // Single response for invalid password
     }
+    if (!user.isActive) {
+      return res.status(403).json({
+        message: "Your account has been blocked. Please contact support.",
+      });
+    }
     if (user.role === "seller") {
       if (user.sellerStatus === "pending") {
         return res.status(403).json({
