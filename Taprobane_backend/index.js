@@ -11,6 +11,8 @@ const uploadRoutes = require("./routes/upload.routes");
 const contactRoutes = require("./routes/contact.routes");
 const blogRoutes = require("./routes/blog.routes");
 const adminRoutes = require("./routes/admin.routes");
+const sellerRoutes = require("./routes/seller.routes");
+const sellerDashboardRoutes = require("./routes/seller.dashboard.routes");
 const path = require("path");
 const app = express();
 const session = require("express-session");
@@ -46,6 +48,8 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/sellers", sellerRoutes);
+app.use("/api/seller-dashboard", sellerDashboardRoutes);
 
 app.get("/", (req, res) => {
   res.send("hello world from Node API");

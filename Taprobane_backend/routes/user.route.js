@@ -4,6 +4,7 @@ const {
   loginUser,
   currentUser,
   resetPassword,
+  getSellerStatus,
 } = require("../controllers/user.controller");
 const { authenticate } = require("../middleware/authmiddleware");
 const verifyRecaptcha = require("../middleware/recaptcha.middleware");
@@ -14,7 +15,7 @@ router.post("/register", verifyRecaptcha(), registerUser);
 router.post("/login", verifyRecaptcha(), loginUser);
 
 router.get("/current", authenticate, currentUser);
-
+router.get("/:id/status", getSellerStatus);
 router.post("/reset-password", resetPassword);
 router.post("/refresh-token", (req, res) => {
   const { token } = req.body;

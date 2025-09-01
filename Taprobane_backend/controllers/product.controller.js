@@ -116,7 +116,13 @@ const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
     let updates = req.body;
-    // If eco score fields are being updated, recalculate
+
+    // If a file is uploaded, update thumbnail
+    if (req.file) {
+      updates.thumbnail = `/uploads/${req.file.filename}`; // save file path
+    }
+
+    // Recalculate eco scores if necessary
     if (updates.materialType || updates.packagingType || updates.carbonSource) {
       const { materialScore, packagingScore, carbonScore, ecoScore } =
         calculateEcoScores(
@@ -133,15 +139,10 @@ const updateProduct = async (req, res) => {
       };
     }
 
-    const product = await Product.findByIdAndUpdate(id, updates, {
-      new: true,
-    });
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
+    const product = await Product.findByIdAndUpdate(id, updates, { new: true });
+    if (!product) return res.status(404).json({ message: "Product not found" });
 
-    const updatedProduct = await Product.findById(id);
-    res.status(200).json(updatedProduct);
+    res.status(200).json(product);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -26,18 +26,18 @@ const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
       role,
+      sellerStatus: role === "seller" ? "pending" : undefined,
+      isActive: true,
     });
     console.log(`user created ${user}`);
 
     if (user) {
-      return res
-        .status(201)
-        .json({
-          _id: user._id,
-          fullName: user.fullName,
-          email: user.email,
-          role: user.role,
-        });
+      return res.status(201).json({
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+      });
     } else {
       return res.status(400).json({ message: "Invalid user" });
     }
@@ -67,6 +67,26 @@ const loginUser = async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid email or password" }); // Single response for invalid password
+    }
+    if (user.role === "seller") {
+      if (user.sellerStatus === "pending") {
+        return res.status(403).json({
+          message:
+            "Your seller account is pending approval. Please wait for admin approval.",
+        });
+      }
+
+      if (user.sellerStatus === "rejected") {
+        return res.status(403).json({
+          message: "Your seller account has been rejected. Contact support.",
+        });
+      }
+
+      if (!user.isActive) {
+        return res.status(403).json({
+          message: "Your seller account is blocked.",
+        });
+      }
     }
 
     // Generate the access token
@@ -141,9 +161,21 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const getSellerStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id).select("sellerStatus");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json({ sellerStatus: user.sellerStatus });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch seller status" });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   currentUser,
   resetPassword,
+  getSellerStatus,
 };

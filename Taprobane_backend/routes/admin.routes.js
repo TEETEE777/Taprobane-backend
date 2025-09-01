@@ -4,6 +4,9 @@ const {
   getStats,
   getUsers,
   toggleUserStatus,
+  getSellers,
+  toggleSellerStatus,
+  getSellerProducts,
 } = require("../controllers/admin.controller");
 const {
   authenticate,
@@ -17,6 +20,24 @@ router.put(
   authenticate,
   authorizeRoles("admin"),
   toggleUserStatus
+);
+// Get all sellers
+router.get("/sellers", authenticate, authorizeRoles("admin"), getSellers);
+
+// Block/Unblock a seller
+router.put(
+  "/sellers/:id/toggle",
+  authenticate,
+  authorizeRoles("admin"),
+  toggleSellerStatus
+);
+
+// Optional: Get all products by a seller
+router.get(
+  "/sellers/:id/products",
+  authenticate,
+  authorizeRoles("admin"),
+  getSellerProducts
 );
 
 module.exports = router;

@@ -36,3 +36,12 @@ exports.getReviewsByProduct = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch reviews" });
   }
 };
+
+exports.getAllReviews = async (req, res) => {
+  try {
+    const reviews = await Review.find().sort({ createdAt: -1 }).limit(10); // latest 10 reviews
+    res.status(200).json(reviews);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch reviews" });
+  }
+};

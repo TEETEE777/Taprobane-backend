@@ -23,6 +23,12 @@ const UserSchema = mongoose.Schema(
       enum: ["buyer", "seller", "admin"],
       default: "buyer",
     },
+    sellerStatus: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
+
     googleId: { type: String },
     photo: { type: String },
     isActive: { type: Boolean, default: true },

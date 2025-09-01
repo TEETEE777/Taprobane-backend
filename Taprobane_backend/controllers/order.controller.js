@@ -141,11 +141,30 @@ exports.getOrdersBySeller = async (req, res) => {
   try {
     const sellerObjectId = new mongoose.Types.ObjectId(sellerId);
 
+    // Get all orders that contain at least one item for this seller
     const orders = await Order.find({ "items.sellerId": sellerObjectId }).sort({
       createdAt: -1,
     });
-    res.status(200).json(orders);
+
+    // Filter items in each order to include only the seller's products
+    const filteredOrders = orders.map((order) => {
+      const sellerItems = order.items.filter(
+        (item) => item.sellerId.toString() === sellerId
+      );
+
+      return {
+        ...order.toObject(),
+        items: sellerItems,
+        grandTotal: sellerItems.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        ),
+      };
+    });
+
+    res.status(200).json(filteredOrders);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to fetch seller orders" });
   }
 };
